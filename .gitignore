@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 
 models/random_forest_nifty50.pkl
+models/random_forest_nifty50_v1.pkl

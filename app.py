@@ -66,7 +66,7 @@ st.write(
 )
 
 model = joblib.load(
-    "models/random_forest_nifty50.pkl"
+    "models/random_forest_nifty50_v1.pkl"
 )
 
 st.success("Model Loaded Successfully!")
@@ -103,7 +103,7 @@ if st.button("Analyze Stock"):
     else:
 
         st.success(
-            "Data based till lastest trading day downloaded successfully!"
+            "Latest trading data downloaded successfully!"
         )
 
         close_prices = data["Close"].squeeze()
@@ -128,44 +128,77 @@ if st.button("Analyze Stock"):
         
 
         data = data.dropna()
+        
+        st.subheader(
+            "1 Year Price Chart"
+        )
+
+        st.line_chart(
+            data["Close"]
+        )   
 
         latest = data.iloc[-1]
+        st.subheader("Current Market Data")
+
+        st.write(
+            f"Current Price: ₹{latest['Close']:.2f}"
+        )
 
         # Display latest indicator values
 
-        st.write(
-            "RSI:",
-            round(latest["RSI"], 2)
-    )
+        indicator_df = pd.DataFrame({
+            "Indicator": [
+                "RSI",
+                "MA20",
+                "MA50",
+                "MACD",
+                "MACD Signal",
+                "Volume"
+            ],
+            "Value": [
+                round(latest["RSI"], 2),
+                round(latest["MA20"], 2),
+                round(latest["MA50"], 2),
+                round(latest["MACD"], 2),
+                round(latest["MACD_SIGNAL"], 2),
+                int(latest["VOLUME"])
+            ]
+        })
 
-        st.write(
-            "MA20:",
-            round(latest["MA20"], 2)
+        st.dataframe(
+            indicator_df,
+            use_container_width=True
         )
 
-        st.write(
-            "MA50:",
-            round(latest["MA50"], 2)
-        )
+        if latest["RSI"] > 70:
 
-        st.write(
-            "MACD:",
-            round(latest["MACD"], 2)
-        )
+            st.warning(
+                "RSI indicates overbought conditions."
+            )
 
-        st.write(
-            "MACD Signal:",
-            round(latest["MACD_SIGNAL"], 2)
-        )
+        elif latest["RSI"] < 30:
 
-        st.write(
-            "Volume:",
-            int(latest["VOLUME"])
-        )
+            st.success(
+                "RSI indicates oversold conditions."
+            )
 
-        st.subheader(
-        "Technical Indicators"
-    )
+        else:
+
+            st.info(
+                "RSI is in neutral range."
+            )
+
+        if latest["MA20"] > latest["MA50"]:
+
+            st.success(
+                "Bullish Trend: MA20 is above MA50"
+            )
+
+        else:
+
+            st.warning(
+                "Bearish Trend: MA20 is below MA50"
+            )
 
 
         X_pred = pd.DataFrame(
@@ -187,9 +220,38 @@ if st.button("Analyze Stock"):
             ]
         )
 
+        st.subheader(
+            "AI Prediction"
+        )
+
         prediction = model.predict(
             X_pred
         )[0]
+        confidence = (
+            model.predict_proba(X_pred)[0].max()
+            * 100
+        )
+        st.write(
+            f"Confidence: {confidence:.2f}%"
+        )
+
+        if confidence > 80:
+
+            st.success(
+                "High Confidence Prediction"
+            )
+
+        elif confidence > 60:
+
+            st.info(
+                "Moderate Confidence Prediction"
+            )
+
+        else:
+
+            st.warning(
+                "Low Confidence Prediction"
+            )
 
         if prediction == 1:
 

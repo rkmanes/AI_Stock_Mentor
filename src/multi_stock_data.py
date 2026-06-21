@@ -4,7 +4,6 @@ import ta
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report
 from xgboost import XGBClassifier
 import joblib
 
@@ -42,7 +41,6 @@ for stock in NIFTY50:
 
     data["MACD_SIGNAL"] = macd.macd_signal()
 
-    # New Feature
     data["VOLUME"] = data["Volume"]
 
     # Target
@@ -66,23 +64,6 @@ for stock in NIFTY50:
 combined_data = pd.concat(
     all_data,
     ignore_index=False
-)
-
-print("Total Rows:", len(combined_data))
-
-print(
-    combined_data[
-        [
-            "RSI",
-            "MA20",
-            "MA50",
-            "MACD",
-            "MACD_SIGNAL",
-            "VOLUME",
-            "TARGET",
-            "STOCK"
-        ]
-    ].head()
 )
 
 X = combined_data[
@@ -122,16 +103,6 @@ accuracy = accuracy_score(
     predictions
 )
 
-print("Accuracy:", accuracy)
-
-
-print(
-    classification_report(
-        y_test,
-        predictions
-    )
-)
-
 xgb_model = XGBClassifier(
     n_estimators=100,
     random_state=42
@@ -150,34 +121,29 @@ xgb_accuracy = accuracy_score(
     xgb_predictions
 )
 
-print(
-    "XGBoost Accuracy:",
-    xgb_accuracy
-)
-print(
-    classification_report(
-        y_test,
-        xgb_predictions
-    )
-)
 
-feature_importance = xgb_model.feature_importances_
-for feature, importance in zip(
-    X.columns,
-    feature_importance
-):
-    print(
-        feature,
-        ":",
-        round(importance, 4)
-    )
- 
-print(X.shape)
-print(y.shape)
-print(X_train.shape)
-print(X_test.shape)
 
 joblib.dump(
     model,
-    "models/random_forest_nifty50.pkl"
+    "models/random_forest_nifty50_v1.pkl"
+)
+
+train_accuracy = model.score(
+    X_train,
+    y_train
+)
+
+print(
+    "Train Accuracy:",
+    round(train_accuracy, 4)
+)
+
+print(
+    "Test Accuracy:",
+    round(accuracy, 4)
+)
+
+joblib.dump(
+    list(X.columns),
+    "models/features.pkl"
 )
