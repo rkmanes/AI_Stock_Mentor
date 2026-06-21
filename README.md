@@ -39,7 +39,7 @@ The model uses the following indicators as input features:
 
 ### Random Forest Classifier
 
-* Accuracy: 77.88%
+* Accuracy: 75.67%
 * Final deployed model
 
 ### XGBoost Classifier

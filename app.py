@@ -66,13 +66,13 @@ st.write(
 )
 
 model = joblib.load(
-    "models/random_forest_nifty50_v1.pkl"
+    "models/random_forest_nifty50_v2.pkl"
 )
 
 st.success("Model Loaded Successfully!")
 
 st.info(
-    "Random Forest Model Accuracy: 77.88%"
+    "Random Forest Model Accuracy: 75.67%"
 )
 
 stock_name = st.selectbox(

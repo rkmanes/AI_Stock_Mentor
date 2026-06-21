@@ -88,8 +88,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 ) 
 
 model = RandomForestClassifier(
-    n_estimators=100,
-    random_state=42
+    n_estimators=55,
+    random_state=42,
+    max_depth=22
 )
 
 model.fit(
@@ -125,7 +126,7 @@ xgb_accuracy = accuracy_score(
 
 joblib.dump(
     model,
-    "models/random_forest_nifty50_v1.pkl"
+    "models/random_forest_nifty50_v2.pkl"
 )
 
 train_accuracy = model.score(
